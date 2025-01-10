@@ -30,21 +30,21 @@ namespace DocExporApp.Controllers
 
             string outputPath = Path.Combine(Path.GetTempPath(), $"Generated_{Firstname}.docx");
 
-            // Use an expandable MemoryStream
+           
             using (var stream = new MemoryStream())
             {
                 using (var fileStream = new FileStream(_templatePath, FileMode.Open, FileAccess.Read))
                 {
-                    fileStream.CopyTo(stream); // Copy template content to the stream
+                    fileStream.CopyTo(stream);
                 }
 
-                stream.Position = 0; // Reset stream position to the beginning
+                stream.Position = 0;
 
                 using (var doc = WordprocessingDocument.Open(stream, true))
                 {
                     var body = doc.MainDocumentPart.Document.Body;
 
-                    // Replace placeholders
+                   
                     foreach (var text in body.Descendants<Text>())
                     {
                         text.Text = text.Text.Replace("{Title}", Title)
@@ -52,7 +52,7 @@ namespace DocExporApp.Controllers
                                              .Replace("{Lastname}", Lastname);
                     }
 
-                    // Replace image placeholder if applicable
+                   
                     if (image != null && body.InnerText.Contains("{Image}"))
                     {
                         var imagePart = doc.MainDocumentPart.AddImagePart(DocumentFormat.OpenXml.Packaging.ImagePartType.Jpeg);
@@ -63,20 +63,20 @@ namespace DocExporApp.Controllers
 
                         var imagePartId = doc.MainDocumentPart.GetIdOfPart(imagePart);
 
-                        // Find and replace {Image} with the actual image
+                       
                         foreach (var text in body.Descendants<Text>())
                         {
                             if (text.Text.Contains("{Image}"))
                             {
-                                text.Text = text.Text.Replace("{Image}", ""); // Remove the placeholder
+                                text.Text = text.Text.Replace("{Image}", "");
 
-                                var run = text.Parent as Run;  // Get the parent Run of the text
+                                var run = text.Parent as Run; 
 
                                 if (run != null)
                                 {
-                                    run.AppendChild(CreateImageElement(imagePartId));  // Insert image at the placeholder
+                                    run.AppendChild(CreateImageElement(imagePartId)); 
                                 }
-                                break; // Only replace the first occurrence
+                                break;
                             }
                         }
                     }
@@ -84,7 +84,7 @@ namespace DocExporApp.Controllers
                     doc.MainDocumentPart.Document.Save();
                 }
 
-                // Write the modified content to a new file
+               
                 System.IO.File.WriteAllBytes(outputPath, stream.ToArray());
             }
 
@@ -97,7 +97,7 @@ namespace DocExporApp.Controllers
         {
             return new Drawing(
                 new DW.Inline(
-                    new DW.Extent() { Cx = 990000L, Cy = 792000L },  // Image size in EMUs
+                    new DW.Extent() { Cx = 990000L, Cy = 792000L }, 
                     new DW.EffectExtent()
                     {
                         LeftEdge = 0L,
